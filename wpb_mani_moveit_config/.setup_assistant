@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: wpb_mani_description
+    relative_path: urdf/wpb_mani.urdf.xacro
+    xacro_args: --inorder
+  SRDF:
+    relative_path: config/wpb_mani.srdf
+  CONFIG:
+    author_name: ZhangWanjie
+    author_email: zhangwanjie@6-robot.com
+    generated_timestamp: 1605500237

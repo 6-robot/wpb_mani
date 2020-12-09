@@ -1,0 +1,8 @@
+<launch>
+
+<!-- test motors -->
+ <node pkg="wpb_mani_bringup" type="wpb_mani_test_motors" name="wpb_mani_test_motors"  output="screen">
+    <param name="serial_port" type="string" value="/dev/ftdi"/> 
+</node>
+
+</launch>

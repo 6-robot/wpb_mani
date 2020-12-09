@@ -1,0 +1,22 @@
+<launch>
+
+  <arg name="model" default="$(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro"/>
+  <arg name="gui" default="false" />
+  <arg name="rvizconfig" default="$(find wpb_mani_description)/rviz/urdf.rviz" />
+
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+  <param name="use_gui" value="$(arg gui)"/>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+  <!-- wpb_mani core-->
+  <node pkg="wpb_mani_bringup" type="wpb_mani_core" name="wpb_mani_core" output="screen">
+    <param name="serial_port" type="string" value="/dev/ftdi"/> 
+    <rosparam file="$(find wpb_mani_bringup)/config/wpb_mani.yaml" command="load" />
+  </node>
+
+  <!-- Run wpb_mani_joint_control -->
+  <node name="wpb_mani_joint_control" pkg="wpb_mani_tutorials" type="wpb_mani_joint_control"  output="screen"/>
+
+</launch>

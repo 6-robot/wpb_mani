@@ -1,0 +1,6 @@
+zeros:
+ kinect_height: 0.0
+ kinect_pitch: -0.30
+
+grab:
+ target_y_k: 1.0   

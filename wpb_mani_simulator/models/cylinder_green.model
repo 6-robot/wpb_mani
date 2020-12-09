@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<robot name="cylinder_green">
+<!-- base -->
+<link name="base_link">
+<visual>
+  <geometry>
+    <box size="0.001 0.001 0.001" />
+  </geometry>
+  <origin rpy = "0 0 0" xyz = "0 0 0"/>
+</visual>
+</link>
+
+  <!-- cylinder -->
+  <link name = "cylinder_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.05" length="0.1"/>
+      </geometry>
+      <origin rpy = "0 0 0" xyz = "0 0 0"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.05" length="0.1"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0015" ixy="0.0" ixz="0.0" iyy="0.0015" iyz="0.0" izz="0.0015"/>
+    </inertial>
+  </link>
+  <joint name = "base_to_cylinder" type = "fixed">
+    <parent link = "base_link"/>
+    <child link = "cylinder_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/> <!--pos-->
+  </joint>
+
+<gazebo reference="cylinder_link">
+  <material>Gazebo/Green</material>
+</gazebo>
+
+</robot>

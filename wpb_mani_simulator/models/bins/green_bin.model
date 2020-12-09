@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<robot name="green_bin">
+<!-- base -->
+<link name="base_link">
+<visual>
+  <geometry>
+    <box size="0.001 0.001 0.001" />
+  </geometry>
+  <origin rpy = "0 0 0" xyz = "0 0 0"/>
+</visual>
+</link>
+
+  <!-- body -->
+  <link name = "body_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://wpb_mani_simulator/meshes/bin.STL" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin xyz = "-0.15 0.1 0" rpy = "0 0 0"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.15 0.1 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://wpb_mani_simulator/meshes/bin.STL" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+    </inertial>
+  </link>
+  <joint name = "base_to_body" type = "fixed">
+    <parent link = "base_link"/>
+    <child link = "body_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/> <!--pos-->
+  </joint>
+
+<gazebo reference="body_link">
+  <material>Gazebo/Green</material>
+</gazebo>
+
+
+</robot>

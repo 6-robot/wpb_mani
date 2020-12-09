@@ -1,0 +1,31 @@
+# Simulation settings for using moveit_sim_controllers
+moveit_sim_hw_interface:
+  joint_model_group: wpb_arm
+  joint_model_group_pose: home
+# Settings for ros_control_boilerplate control loop
+generic_hw_control_loop:
+  loop_hz: 300
+  cycle_time_error_threshold: 0.01
+# Settings for ros_control hardware interface
+hardware_interface:
+  joints:
+    - virtual_joint
+    - back_left_wheel_joint
+    - back_right_wheel_joint
+    - joint1
+    - joint2
+    - joint3
+    - joint4
+    - gripper
+    - front_left_wheel_joint
+    - front_right_wheel_joint
+    - kinect_pitch
+    - kinect_height
+  sim_control_mode: 1  # 0: position, 1: velocity
+# Publish all joint states
+# Creates the /joint_states topic necessary in ROS
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+controller_list:
+  []

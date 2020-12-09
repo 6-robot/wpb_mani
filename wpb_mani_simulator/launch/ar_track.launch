@@ -1,0 +1,14 @@
+<launch>
+    <arg name="marker_size" default="5.9" />  <!--定义marker最外框的尺寸，注意单位是厘米-->
+    <arg name="max_new_marker_error" default="0.2" /> 
+    <arg name="max_track_error" default="0.2" />
+    <arg name="cam_image_topic" default="/rgb/image_raw" /> <!--修改为自己发布的图像话题-->
+    <arg name="cam_info_topic" default="/rgb/camera_info" /> <!--修改为自己发布的标定参数话题-->
+    <arg name="output_frame" default="/rgb_camera_link" /> <!--修改为图片所在的坐标系，关系到后续的坐标系自动转换-->
+
+    <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen"
+     args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame)" />
+
+    <include file="$(find wpb_mani_simulator)/launch/wpb_mani_qr_cube.launch"/>
+
+</launch>

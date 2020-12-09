@@ -1,0 +1,18 @@
+<launch>
+
+  <include file="$(find wpb_mani_simulator)/launch/wpb_mani_gazebo.launch"/>
+
+  <!-- js node -->
+  <node respawn="true" pkg="joy" type="joy_node" name="wpb_mani_joy" >
+    <param name="dev" type="string" value="/dev/input/js0" />
+    <param name="deadzone" value="0.12" />
+  </node>
+
+  <!-- Axes Velcmd -->
+  <param name="axis_linear" value="1" type="int"/>
+  <param name="axis_angular" value="0" type="int"/>
+  <param name="scale_linear" value="1" type="double"/>
+  <param name="scale_angular" value="1" type="double"/>
+  <node pkg="wpb_mani_bringup" type="wpb_mani_js_vel" name="teleop"/>
+
+</launch>

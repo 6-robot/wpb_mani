@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<robot name="table_20cm">
+<!-- base -->
+<link name="base_link">
+<visual>
+  <geometry>
+    <box size="0.001 0.001 0.001" />
+  </geometry>
+  <origin rpy = "0 0 0" xyz = "0 0 0"/>
+</visual>
+</link>
+
+  <!-- plane -->
+  <link name = "plane_link">
+    <visual>
+      <geometry>
+        <box size="0.3 1.5 0.02"/>
+      </geometry>
+      <origin rpy = "0 0 0" xyz = "0 0 0"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.3 1.5 0.02"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1"/>
+      <inertia ixx="0.015" ixy="0.0" ixz="0.0" iyy="0.015" iyz="0.0" izz="0.015"/>
+    </inertial>
+  </link>
+  <joint name = "base_to_plane" type = "fixed">
+    <parent link = "base_link"/>
+    <child link = "plane_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.19"/> <!--pos-->
+  </joint>
+
+  <!-- legs-->
+  <link name = "left_link">
+    <visual>
+      <geometry>
+        <box size="0.3 0.02 0.2"/>
+      </geometry>
+      <origin rpy = "0 0 0" xyz = "0 0 0"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.3 0.02 0.2"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1"/>
+      <inertia ixx="0.015" ixy="0.0" ixz="0.0" iyy="0.015" iyz="0.0" izz="0.015"/>
+    </inertial>
+  </link>
+  <joint name = "plane_to_left" type = "fixed">
+    <parent link = "plane_link"/>
+    <child link = "left_link"/>
+    <origin rpy="0 0 0" xyz="0 0.76 -0.09"/> <!--pos-->
+  </joint>
+
+  <link name = "right_link">
+    <visual>
+      <geometry>
+        <box size="0.3 0.02 0.2"/>
+      </geometry>
+      <origin rpy = "0 0 0" xyz = "0 0 0"/>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.3 0.02 0.2"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1"/>
+      <inertia ixx="0.015" ixy="0.0" ixz="0.0" iyy="0.015" iyz="0.0" izz="0.015"/>
+    </inertial>
+  </link>
+  <joint name = "plane_to_right" type = "fixed">
+    <parent link = "plane_link"/>
+    <child link = "right_link"/>
+    <origin rpy="0 0 0" xyz="0 -0.76 -0.09"/> <!--pos-->
+  </joint>
+
+<gazebo reference="plane_link">
+  <material>Gazebo/White</material>
+</gazebo>
+
+</robot>

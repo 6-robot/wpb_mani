@@ -1,0 +1,48 @@
+<launch>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find wpb_mani_simulator)/worlds/scene_1.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="recording" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!-- Spawn a robot into Gazebo -->
+  <param name="robot_description" command="$(find xacro)/xacro.py --inorder $(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro" />
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -x 1.5 -y -2 -Y 1.5707 -model wpb_mani" />
+
+  <!-- load the controllers of wpb_mani-->
+  <include file="$(find wpb_mani_simulator)/launch/wpb_mani_controllers.launch"/>
+
+  <!-- Run lidar filter -->
+  <node pkg="wpb_mani_simulator" type="wpb_mani_sim_lidar_filter" name="wpb_mani_sim_lidar_filter">
+    <param name="pub_topic" value="/scan"/>
+  </node>
+
+  <!-- Gmapping -->
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping">
+    <param name="base_frame" value="base_footprint"/>
+  </node>
+
+  <!-- Rviz -->
+  <arg name="model" default="$(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro"/>
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+  <arg name="rvizconfig" default="$(find wpb_mani_simulator)/rviz/slam.rviz" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+  <!-- js node -->
+  <node respawn="true" pkg="joy" type="joy_node" name="wpb_mani_joy" >
+    <param name="dev" type="string" value="/dev/input/js0" />
+    <param name="deadzone" value="0.12" />
+  </node>
+
+  <!-- Axes Velcmd -->
+  <param name="axis_linear" value="1" type="int"/>
+  <param name="axis_angular" value="0" type="int"/>
+  <param name="scale_linear" value="1" type="double"/>
+  <param name="scale_angular" value="1" type="double"/>
+  <node pkg="wpb_mani_bringup" type="wpb_mani_js_vel" name="teleop"/>
+
+</launch>

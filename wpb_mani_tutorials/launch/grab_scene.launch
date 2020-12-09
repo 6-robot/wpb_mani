@@ -1,0 +1,26 @@
+<launch>
+
+  <!--- Azure Kinect -->
+  <include file="$(find wpb_mani_bringup)/launch/azure_kinect_720p_wfov.launch" />
+
+  <!-- wpb_mani core-->
+  <node pkg="wpb_mani_bringup" type="wpb_mani_core" name="wpb_mani_core" output="screen">
+    <param name="serial_port" type="string" value="/dev/ftdi"/> 
+    <rosparam file="$(find wpb_mani_bringup)/config/wpb_mani.yaml" command="load" />
+  </node>
+
+  <!-- wpb_mani_boxes_3d-->
+  <node pkg="wpb_mani_behaviors" type="wpb_mani_boxes_3d" name="wpb_mani_boxes_3d" output="screen"/>
+
+  <!-- wpb_mani_grab_box-->
+  <node pkg="wpb_mani_behaviors" type="wpb_mani_grab_box" name="wpb_mani_grab_box" output="screen"/>
+
+  <!-- RViz and TF tree -->
+  <arg name="rvizconfig" default="$(find wpb_mani_tutorials)/rviz/object_detect.rviz" />
+  <arg name="model" default="$(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro"/>
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+</launch>

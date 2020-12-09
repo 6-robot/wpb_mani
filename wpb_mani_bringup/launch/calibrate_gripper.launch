@@ -1,0 +1,6 @@
+<launch>
+
+  <!-- calibrate -->
+  <node pkg="wpb_mani_bringup" type="wpb_mani_calibrate_gripper" name="wpb_mani_calibrate_gripper" output="screen"/>
+
+</launch>

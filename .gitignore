@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+#map
+wpb_mani_tutorials/maps/*.pgm
+wpb_mani_tutorials/maps/*.yaml

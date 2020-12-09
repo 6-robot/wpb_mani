@@ -1,0 +1,497 @@
+<robot name="wpb_mani" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+  <xacro:property name="length" value="0.4"/>
+  <xacro:property name="width" value="0.31"/>
+
+  <!-- base_footprint -->
+  <link name="base_footprint">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.001 0.001 0.001" />
+        </geometry>
+        <material name="TransparentGreen" />
+      </visual>
+  </link>
+  <joint name="base_joint" type="fixed">
+    <origin xyz="0 0 0.02" rpy="0 0 0" />
+    <parent link="base_footprint"/>
+    <child link="base_link" />
+  </joint>
+
+  <!-- base_link -->
+  <link name="base_link">
+      <visual>
+          <geometry>
+              <mesh filename="package://wpb_mani_description/meshes/wpb_mani_base.dae" scale="1 1 1"/>
+          </geometry>
+        <origin rpy = "0 0 3.1415926535897931" xyz = "-0.003 0.0005 -0.01"/>
+      </visual>
+      <collision>
+        <origin xyz="0.005 0 0.05" rpy="0 0 0" />
+        <geometry>
+          <box size="0.57 0.37 0.1"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="20"/>
+      <inertia ixx="10" ixy="0.0" ixz="0.0" iyy="10" iyz="0.0" izz="10"/>
+      </inertial>
+  </link>
+
+  <!-- mecanum wheel unit -->
+  <xacro:macro name="mecanum_wheel" params="LR FB">
+      <xacro:if value="${LR=='left'}">
+        <xacro:property name="SignY" value="1"/>
+        <xacro:property name="RollWheel" value="0"/>
+      </xacro:if>
+      <xacro:if value="${LR=='right'}">
+        <xacro:property name="SignY" value="-1"/>
+        <xacro:property name="RollWheel" value="3.1415926535897931"/>
+      </xacro:if>
+      <xacro:if value="${FB=='front'}">
+        <xacro:property name="SignX" value="1"/>
+      </xacro:if>
+      <xacro:if value="${FB=='back'}">
+        <xacro:property name="SignX" value="-1"/>
+      </xacro:if>
+      <link name="${FB}_${LR}_wheel_link">
+          <visual>
+              <origin xyz="0.0 0.06 0.0" rpy="1.570796327 0 0"/>
+              <geometry>
+                <xacro:if value="${(LR=='left' and FB=='front') or (LR=='right' and FB=='back')}">
+                  <mesh filename="package://wpb_mani_description/meshes/mecanum_a.dae" scale="1 1 1"/>
+                </xacro:if>
+                <xacro:if value="${(LR=='right' and FB=='front')  or (LR=='left' and FB=='back')}">
+                  <mesh filename="package://wpb_mani_description/meshes/mecanum_b.dae" scale="1 1 1"/>
+                </xacro:if>
+              </geometry>    
+          </visual>
+          <collision>
+            <origin xyz="0 0.029 0" rpy="1.570796327 0 0" />
+            <geometry>
+              <cylinder length="0.058" radius="0.001"/>
+            </geometry>
+          </collision>
+          <inertial>
+            <mass value="0.00001"/>
+            <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+          </inertial>
+      </link>
+      <joint name="${FB}_${LR}_wheel_joint" type="continuous">
+          <parent link="base_link"/>
+          <child link="${FB}_${LR}_wheel_link"/>
+          <origin xyz="${SignX*length/2}   ${SignY*width/2}  0.029" rpy="${RollWheel} 0.0 0.0"/>
+          <axis xyz="0 1 0"/>
+      </joint>
+      <transmission name="${FB}_${LR}_transmission">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${FB}_${LR}_wheel_joint">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>  
+      <actuator name="${FB}_${LR}_motor">
+        <hardwareInterface>PositionJointInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+  </xacro:macro>
+
+  <!-- wheels -->
+  <xacro:mecanum_wheel FB="front" LR="left"/>
+  <xacro:mecanum_wheel FB="front" LR="right"/>
+  <xacro:mecanum_wheel FB="back" LR="right"/>
+  <xacro:mecanum_wheel FB="back" LR="left"/>
+
+  <!-- foot unit -->
+  <xacro:macro name="wheel_foot" params="LR FB">
+      <xacro:if value="${LR=='left'}">
+        <xacro:property name="SignY" value="1"/>
+      </xacro:if>
+      <xacro:if value="${LR=='right'}">
+        <xacro:property name="SignY" value="-1"/>
+      </xacro:if>
+      <xacro:if value="${FB=='front'}">
+        <xacro:property name="SignX" value="1"/>
+      </xacro:if>
+      <xacro:if value="${FB=='back'}">
+        <xacro:property name="SignX" value="-1"/>
+      </xacro:if>
+      <link name="${FB}_${LR}_foot_link">
+          <visual>
+              <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+              <geometry>
+                <box size="0.001 0.001 0.001"/>
+              </geometry>    
+          </visual>
+          <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+              <cylinder length="0.01" radius="0.05"/>
+            </geometry>
+          </collision>
+          <inertial>
+            <mass value="0.1"/>
+            <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+          </inertial>
+      </link>
+        <joint name="${FB}_${LR}_foot_joint" type="fixed">
+          <parent link="base_link"/>
+          <child link="${FB}_${LR}_foot_link"/>
+          <origin xyz="${SignX*length/2}   ${SignY*width/1.5}  0.029" rpy="1.57 0.0 0.0"/>
+      </joint>
+  </xacro:macro>
+
+  <xacro:wheel_foot FB="front" LR="left"/>
+  <xacro:wheel_foot FB="front" LR="right"/>
+  <xacro:wheel_foot FB="back" LR="right"/>
+  <xacro:wheel_foot FB="back" LR="left"/>
+
+  <!-- Import manipulator's rviz colors -->
+  <xacro:include filename="$(find wpb_mani_description)/urdf/materials.xacro" />
+
+  <!-- Import manipulator's URDF -->
+    <xacro:include filename="$(find wpb_mani_description)/urdf/open_manipulator_x.urdf.xacro"/>
+
+  <!-- Base fixed joint -->
+  <joint name="base_fixed" type="fixed">
+    <origin xyz="0.203 0.0 0.1575" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="link1"/>
+  </joint>
+
+  <!-- Gazebo plugin for WPR -->
+  <gazebo>
+    <plugin name="base_controller" filename="libwpr_plugin.so">
+      <publishOdometryTf>true</publishOdometryTf>
+      <commandTopic>cmd_vel</commandTopic>
+      <odometryTopic>/odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+      <odometryRate>20.0</odometryRate>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
+    </plugin>
+  </gazebo>
+
+  <!-- Gazebo plugin for move -->
+  <!-- <gazebo>
+    <plugin name="planar_controller" filename="libgazebo_ros_planar_move.so">
+      <commandTopic>cmd_vel</commandTopic>
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+      <odometryRate>10.0</odometryRate>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
+      <broadcastTF>true</broadcastTF>
+    </plugin>
+  </gazebo> -->
+
+  <!-- Lidar -->
+  <link name = "laser">
+    <visual>
+    <geometry>
+      <cylinder length="0.001" radius="0.001"/>
+    </geometry>
+    <origin rpy = "0 0 0" xyz = "0 0 0"/>
+    </visual>
+  </link>
+  <joint name="laser_joint" type="fixed">
+      <origin rpy="0 0 3.1415926" xyz="0.215 0 0.13"  />
+      <parent link="base_link" />
+      <child link="laser" />
+  </joint>
+
+  <!-- Gazebo plugin for RpLidar A2 -->
+  <gazebo reference="laser">
+    <sensor type="ray" name="rplidar_sensor">
+      <pose>0 0 0.06 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>10</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159265</min_angle>
+            <max_angle>3.14159265</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.02</min>
+          <max>10.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <!-- <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise> -->
+      </ray>
+      <plugin name="rplidar_ros_controller" filename="libgazebo_ros_laser.so">
+        <topicName>scan_raw</topicName>
+        <frameName>laser</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- azure kinect -->
+  <link name = "kinect_height_link">
+    <visual>
+    <geometry>
+      <box size="0.03 0.025 0.02"/>
+    </geometry>
+    <material name="black"/>
+    <origin rpy = "0 0 0" xyz = "0 0 -0.01"/>
+    </visual>
+    <inertial>
+      <mass value="0.001"/>
+      <inertia ixx="0.000375" ixy="0.0" ixz="0.0" iyy="0.000208333" iyz="0.0" izz="0.000433333"/>
+    </inertial>
+  </link>
+  <joint name="kinect_height" type="prismatic">
+      <parent link="base_link"/>
+      <child link="kinect_height_link"/>
+      <limit effort="1000.0" lower="-0.1" upper="0.1" velocity="0.5"/>
+      <origin xyz="-0.15 0 0.585" rpy="0 -1.5707963 0"/>
+  </joint>
+  <transmission name="kinect_height_transmission">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="kinect_height">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>  
+    <actuator name="kinect_height_motor">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <gazebo reference="kinect_height_link">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <link name = "kinect_pitch_link">
+    <visual>
+    <geometry>
+      <box size="0.001 0.001 0.001"/>
+    </geometry>
+    <origin rpy = "0 0 0" xyz = "0 0 0"/>
+    <material name = "red"/>
+    </visual>
+    <inertial>
+        <mass value="0.1"/>
+        <inertia ixx="0.021862813" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.021862813"/> 
+    </inertial>
+  </link>
+  <joint name="kinect_pitch" type="revolute">
+      <axis xyz="0 -1 0"/>
+      <limit effort="1000.0" lower="-1.57" upper="1.57" velocity="0.5"/>
+      <origin xyz="0 0 0" rpy="0 0 0" /> 
+      <parent link="kinect_height_link" />
+      <child link="kinect_pitch_link" />
+  </joint>
+  <transmission name="kinect_pitch_transmission">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="kinect_pitch">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>  
+    <actuator name="kinect_pitch_motor">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <link name="kinect_link">
+      <visual>
+        <geometry>
+              <mesh filename="package://wpb_mani_description/meshes/azure_kinect.dae" scale="1 1 1"/>
+          </geometry>
+        <origin rpy = "-1.570796327 0 1.570796327" xyz = "0.02 0.002 0.02"/>
+      </visual>
+  </link>
+  <joint name="kinect_joint" type="fixed">
+    <origin xyz="0.018 0 -0.04" rpy="0 1.5707963 0" />
+    <parent link="kinect_pitch_link"/>
+    <child link="kinect_link" />
+  </joint>
+
+  <link name="camera_base">
+      <visual>
+        <origin xyz="-0.013 0. 0." />
+        <geometry>
+          <!-- <box size="0.026 0.103 0.039" /> -->
+          <box size="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="grey" />
+      </visual>
+    </link>
+  <joint name="kinect_base_joint" type="fixed">
+    <origin xyz="0.02 0 0" rpy="0 0 0" />
+    <parent link="kinect_link"/>
+    <child link="camera_base" />
+  </joint>
+
+  <link name="camera_body">
+    <visual>
+      <origin xyz="0. 0. 0." />
+      <geometry>
+        <!-- <box size="0.0994 0.0996 0.023" /> -->
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="white" />
+    </visual>
+  </link>
+  <joint name="camera_base_to_body" type="fixed">
+    <parent link="camera_base" />
+    <child link="camera_body" />
+    <origin xyz="-0.0757 0. 0.008" rpy="0. 0. 0." />
+  </joint>
+
+  <link name="camera_visor">
+    <visual>
+      <origin xyz="-0.0128 0. 0." />
+      <geometry>
+        <!-- <box size="0.026 0.101 0.037" /> -->
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="black" />
+    </visual>
+  </link>
+  <joint name="camera_base_to_visor" type="fixed">
+    <parent link="camera_base" />
+    <child link="camera_visor" />
+    <origin xyz="0. 0. 0." rpy="0. 0. 0." />
+  </joint>
+
+
+  <link name = "kinect_front_frame">
+    <visual>
+    <geometry>
+      <box size="0.001 0.001 0.001"/>
+    </geometry>
+    <origin xyz = "0 0 0" rpy = "0 0 0"/>
+    </visual>
+  </link>
+  <joint name="kinect_head" type="fixed">
+    <origin xyz="-0.005 0 -0.02" rpy=" 0 1.57 0" /> 
+    <parent link="kinect_pitch_link" />
+    <child link="kinect_front_frame" />
+  </joint>
+  <link name = "kinect_ir_optical_frame">
+    <visual>
+    <geometry>
+      <!-- <box size=".25 .04 .07"/>-->
+      <box size="0.001 0.001 0.001"/>
+    </geometry>
+    <origin xyz = "0 0 0" rpy = "0 0 0"/>
+    </visual>
+  </link>
+  <joint name="kinect_ir_trans" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.57 0 -1.57" /> 
+    <parent link="kinect_front_frame" />
+    <child link="kinect_ir_optical_frame" />
+  </joint>
+
+  <gazebo reference="kinect_front_frame">
+    <sensor type="depth" name="azure_kinect_depth">
+      <always_on>true</always_on>
+      <update_rate>15</update_rate>
+      <camera name="azure_kinect_depth">
+        <image>
+          <width>640</width>
+          <height>576</height>
+          <format>B8G8R8</format>
+        </image>
+        <horizontal_fov>1.57079632679</horizontal_fov>
+        <clip>
+          <near>0.25</near>
+          <far>10.0</far>
+        </clip>
+      </camera>
+      <plugin name="azrue_depth_control" filename="libgazebo_ros_openni_kinect.so">
+          <cameraName></cameraName>
+          <alwaysOn>true</alwaysOn>
+          <updateRate>15.0</updateRate>
+          <imageTopicName>depth/image_color</imageTopicName>
+          <depthImageTopicName>depth/image_raw</depthImageTopicName>
+          <pointCloudTopicName>points2</pointCloudTopicName>
+          <cameraInfoTopicName>depth/camera_info</cameraInfoTopicName>
+          <frameName>kinect_ir_optical_frame</frameName>
+          <pointCloudCutoff>0.25</pointCloudCutoff>
+          <pointCloudCutoffMax>2.88</pointCloudCutoffMax>
+          <baseline>0.07</baseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="camera_visor">
+      <sensor type="camera" name="azure_kinect_color">
+          <always_on>true</always_on>
+          <update_rate>15.0</update_rate>
+          <camera name="azure_kinect_color">
+            <horizontal_fov>1.525423729</horizontal_fov>
+            <image>
+                <width>1280</width>
+                <height>720</height>
+                <format>R8G8B8</format>
+            </image>
+            <clip>
+                <near>0.2</near>
+                <far>10.0</far>
+            </clip>
+            <noise>
+                <type>gaussian</type>
+                <mean>0.0</mean>
+                <stddev>0.007</stddev>
+            </noise>
+          </camera>
+          <plugin name="azrue_rgb_controller" filename="libgazebo_ros_camera.so">
+            <alwaysOn>true</alwaysOn>
+            <update_rate>15.0</update_rate>
+            <cameraName>rgb</cameraName>
+            <imageTopicName>image_raw</imageTopicName>
+            <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+            <frameName>kinect_ir_optical_frame</frameName>
+            <baseline>0.1</baseline>
+            <distortionK1>0.0</distortionK1>
+            <distortionK2>0.0</distortionK2>
+            <distortionK3>0.0</distortionK3>
+            <distortionT1>0.0</distortionT1>
+            <distortionT2>0.0</distortionT2>
+          </plugin>
+      </sensor>
+  </gazebo>
+
+  <!-- for ros_bag -->
+  <link name="rgb_temp_link">
+    <visual>
+    <geometry>
+      <box size="0.001 0.001 0.001"/>
+    </geometry>
+    <origin xyz = "0 0 0" rpy = "0 0 0"/>
+    </visual>
+  </link>
+  <joint name="camera_visor_to_temp" type="fixed">
+    <parent link="camera_visor" />
+    <child link="rgb_temp_link" />
+    <origin xyz="0. 0. 0." rpy="0 1.5707 0." />
+  </joint>
+  <link name="rgb_camera_link">
+    <visual>
+    <geometry>
+      <box size="0.001 0.001 0.001"/>
+    </geometry>
+    <origin xyz = "0 0 0" rpy = "0 0 0"/>
+    </visual>
+  </link>
+  <joint name="camera_temp_to_rgb" type="fixed">
+    <parent link="rgb_temp_link" />
+    <child link="rgb_camera_link" />
+    <origin xyz="0. 0. 0." rpy="0 0 -1.5707" />
+  </joint>
+
+  <gazebo reference="end_effector_link">
+    <material>Gazebo/White</material>
+  </gazebo>
+
+ </robot>

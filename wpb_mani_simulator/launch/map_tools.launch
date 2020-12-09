@@ -1,0 +1,81 @@
+<launch>
+  <master auto="start"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find wpb_mani_simulator)/worlds/scene_1.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="recording" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!-- Spawn the boxes and bins -->
+  <node name="table" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpb_mani_simulator)/models/table_20cm.model -x 0.5 -y 3.8 -z 0 -Y 1.57 -urdf -model table" />
+
+  <node name="box_1" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpb_mani_simulator)/models/boxes/box_yellow.model -x 1.0 -y 3.91 -z 3.0 -Y 3.14159 -urdf -model box_1" />
+  <node name="box_2" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpb_mani_simulator)/models/boxes/box_yellow.model -x 0.7 -y 3.91 -z 3.0 -Y 3.14159 -urdf -model box_2" />
+  <node name="box_3" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpb_mani_simulator)/models/boxes/box_yellow.model -x 0.2 -y 3.91 -z 3.0 -Y 3.14159 -urdf -model box_3" />
+
+  <node name="red_bin" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpb_mani_simulator)/models/bins/red_bin.model -x -2.2 -y 0.12 -z 0.0 -Y 3.14159 -urdf -model red_bin" />
+  <node name="green_bin" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpb_mani_simulator)/models/bins/green_bin.model -x -2.2 -y 0.42 -z 0.0 -Y 3.14159 -urdf -model green_bin" />
+  <node name="blue_bin" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpb_mani_simulator)/models/bins/blue_bin.model -x -2.2 -y -0.18 -z 0.0 -Y 3.14159 -urdf -model blue_bin" />
+
+  <!-- Spawn a robot into Gazebo -->
+  <param name="robot_description" command="$(find xacro)/xacro.py --inorder $(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro" />
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -x 1.5 -y -2 -Y 1.5707 -model wpb_mani" />
+
+  <!-- load the controllers of wpb_mani-->
+  <include file="$(find wpb_mani_simulator)/launch/wpb_mani_controllers.launch"/>
+
+  <!-- Run lidar filter -->
+  <node pkg="wpb_mani_simulator" type="wpb_mani_sim_lidar_filter" name="wpb_mani_sim_lidar_filter">
+    <param name="pub_topic" value="/scan"/>
+  </node>
+
+  <!-- Run the map server -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find wpb_mani_tutorials)/maps/map.yaml"/>
+
+  <!--- Run AMCL -->
+  <include file="$(find wpb_mani_tutorials)/nav_lidar/amcl_omni.launch" />
+
+  <!--- Run move base -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base"  output="screen">
+    <rosparam file="$(find wpb_mani_tutorials)/nav_lidar/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find wpb_mani_tutorials)/nav_lidar/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find wpb_mani_tutorials)/nav_lidar/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find wpb_mani_tutorials)/nav_lidar/global_costmap_params.yaml" command="load" />
+    <param name="base_global_planner" value="global_planner/GlobalPlanner" /> 
+    <param name="use_dijkstra" value="true"/>
+    <param name="base_local_planner" value="wpb_local_planner/WpbLocalPlanner" />
+
+    <param name= "controller_frequency" value="10" type="double"/>
+  </node>
+
+  <!-- Map tools  -->
+  <node pkg="waterplus_map_tools" type="wp_manager" name="wp_manager" output="screen"/>
+
+  <!-- WP_navi_server  -->
+  <node pkg="waterplus_map_tools" type="wp_navi_server" name="wp_navi_server" output="screen"/>
+
+  <!-- Boxes 3d  -->
+  <node pkg="wpb_mani_behaviors" type="wpb_mani_boxes_3d"  name="wpb_mani_boxes_3d" output= "screen" />
+
+  <!-- Grab box  -->
+  <node pkg="wpb_mani_behaviors" type="wpb_mani_grab_box"  name="wpb_mani_grab_box"  output= "screen">
+    <rosparam file="$(find wpb_mani_simulator)/config/wpb_mani_sim.yaml" command="load" />
+  </node>
+
+
+  <!-- RViz and TF tree -->
+  <arg name="model" default="$(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro"/>
+  <arg name="gui" default="true" />
+  <arg name="rvizconfig" default="$(find waterplus_map_tools)/rviz/nav.rviz" />
+
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+  <param name="use_gui" value="$(arg gui)"/>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+</launch>

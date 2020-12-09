@@ -1,0 +1,127 @@
+wpb_mani:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 20  
+  
+  # Position Controllers ---------------------------------------
+  front_left_controller:
+    type: position_controllers/JointPositionController
+    joint: front_left_wheel_joint
+    pid: {p: 500.0, i: 300.0, d: 50.0}
+
+  front_right_controller:
+    type: position_controllers/JointPositionController
+    joint: front_right_wheel_joint
+    pid: {p: 500.0, i: 300.0, d: 50.0}
+
+  back_left_controller:
+    type: position_controllers/JointPositionController
+    joint: back_left_wheel_joint
+    pid: {p: 500.0, i: 300.0, d: 50.0}
+
+  back_right_controller:
+    type: position_controllers/JointPositionController
+    joint: back_right_wheel_joint
+    pid: {p: 500.0, i: 300.0, d: 50.0}
+
+  joint1_position_controller:
+    type: position_controllers/JointPositionController
+    joint: joint1
+    pid: {p: 500.0, i: 300.0, d: 50.0}
+
+  joint2_position_controller:
+    type: position_controllers/JointPositionController
+    joint: joint2
+    pid: {p: 500.0, i: 300.0, d: 50.0}
+  
+  joint3_position_controller:
+    type: position_controllers/JointPositionController
+    joint: joint3
+    pid: {p: 300.0, i: 10.0, d: 7.0}
+  
+  joint4_position_controller:
+    type: position_controllers/JointPositionController
+    joint: joint4
+    pid: {p: 300.0, i: 1.0, d: 100.0}
+
+  gripper_position_controller:
+    type: position_controllers/JointPositionController
+    joint: gripper
+    pid: {p: 300.0, i: 10.0, d: 7.0}
+
+  gripper_sub_position_controller:
+    type: position_controllers/JointPositionController
+    joint: gripper_sub
+    pid: {p: 300.0, i: 1.0, d: 100.0}
+
+  kinect_height_position_controller:
+    type: position_controllers/JointPositionController
+    joint: kinect_height
+    pid: {p: 300.0, i: 1.0, d: 100.0}
+  
+  kinect_pitch_position_controller:
+    type: position_controllers/JointPositionController
+    joint: kinect_pitch
+    pid: {p: 3000.0, i: 1.0, d: 100.0}
+
+  
+#PID Gains ---------------------------------------
+  gazebo_ros_control:
+    pid_gains:
+      front_left_wheel_joint:
+          p: 500.0
+          i: 300
+          d: 50.0
+      front_right_wheel_joint:
+          p: 500.0
+          i: 300
+          d: 50.0
+      back_left_wheel_joint:
+          p: 500.0
+          i: 300
+          d: 50.0
+      back_right_wheel_joint:
+          p: 500.0
+          i: 300
+          d: 50.0
+      joint1:
+          p: 300.0
+          i: 100.1
+          d: 101.0
+          i_clamp: 0.2
+      joint2:
+          p: 300.0
+          i: 0.1
+          d: 1.0
+          i_clamp: 0.2
+      joint3:
+          p: 300.0
+          i: 0.1
+          d: 1.0
+          i_clamp: 0.2
+      joint4:
+          p: 300.0
+          i: 0.1
+          d: 1.0
+          i_clamp: 0.2
+      gripper:
+          p: 300.0
+          i: 100.0
+          d: 1.0
+          i_clamp: 10.0
+      gripper_sub:
+          p: 300.0
+          i: 100.0
+          d: 1.0
+          i_clamp: 10.0
+      kinect_height:
+          p: 300.0
+          i: 10.0
+          d: 10.0
+          i_clamp: 10.0
+      kinect_pitch:
+          p: 2000.0
+          i: 10.0
+          d: 10.0
+          i_clamp: 10.0

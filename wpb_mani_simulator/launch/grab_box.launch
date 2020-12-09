@@ -1,0 +1,13 @@
+<launch>
+
+    <include file="$(find wpb_mani_simulator)/launch/wpb_mani_boxes.launch"/>
+
+    <node pkg="wpb_mani_behaviors" type="wpb_mani_boxes_3d"  name="wpb_mani_boxes_3d" output= "screen" />
+
+    <node pkg="wpb_mani_behaviors" type="wpb_mani_grab_box"  name="wpb_mani_grab_box"  output= "screen">
+        <rosparam file="$(find wpb_mani_simulator)/config/wpb_mani_sim.yaml" command="load" />
+    </node>
+
+    <!-- <node pkg="wpb_mani_tutorials" type="wpb_mani_grab_height"  name="wpb_mani_grab_demo" output= "screen" /> -->
+
+</launch>

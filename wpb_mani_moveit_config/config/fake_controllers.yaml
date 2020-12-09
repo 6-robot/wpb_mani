@@ -1,0 +1,14 @@
+controller_list:
+  - name: fake_wpb_arm_controller
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+  - name: fake_hand_controller
+    joints:
+      - joint4
+      - gripper
+initial:  # Define initial robot poses.
+  - group: wpb_arm
+    pose: home

@@ -1,0 +1,33 @@
+<launch>
+
+   <!-- Load joint controller configurations from YAML file to parameter server -->
+  <rosparam file="$(find wpb_mani_simulator)/config/wpb_mani_control.yaml" command="load"/>
+
+  <!-- load the controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"  output="screen" ns="/wpb_mani"  args=
+  "joint_state_controller
+    front_left_controller
+    front_right_controller
+    back_left_controller
+    back_right_controller
+    joint1_position_controller
+    joint2_position_controller
+    joint3_position_controller
+    joint4_position_controller
+    gripper_position_controller
+    gripper_sub_position_controller
+    kinect_height_position_controller
+    kinect_pitch_position_controller"/>
+    
+  <!-- convert joint states to TF transforms for rviz, etc -->
+  <param name="wpb_mani_description" command="$(find xacro)/xacro.py --inorder $(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro" />
+  <node name="gazebo_wpb_mani_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+    <remap from="robot_description" to="wpb_mani_description" />
+    <remap from="/joint_states" to="/wpb_mani/joint_states" />
+  </node>
+
+  <node name="wpb_mani_sim" pkg="wpb_mani_simulator" type="wpb_mani_sim" output="screen">
+    <rosparam file="$(find wpb_mani_bringup)/config/wpb_mani.yaml" command="load" />
+  </node>
+
+</launch>

@@ -1,0 +1,22 @@
+<launch>
+
+  <!-- wpb_mani core-->
+  <node pkg="wpb_mani_bringup" type="wpb_mani_core" name="wpb_mani_core" output="screen">
+    <param name="serial_port" type="string" value="/dev/ftdi"/> 
+    <rosparam file="$(find wpb_mani_bringup)/config/wpb_mani.yaml" command="load" />
+  </node>
+
+  <!-- js node -->
+  <node respawn="true" pkg="joy" type="joy_node" name="wpb_mani_joy" >
+    <param name="dev" type="string" value="/dev/input/js0" />
+    <param name="deadzone" value="0.12" />
+  </node>
+
+  <!-- Axes Velcmd -->
+  <param name="axis_linear" value="1" type="int"/>
+  <param name="axis_angular" value="0" type="int"/>
+  <param name="scale_linear" value="1" type="double"/>
+  <param name="scale_angular" value="1" type="double"/>
+  <node pkg="wpb_mani_bringup" type="wpb_mani_js_vel" name="teleop"  output="screen"/>
+
+</launch>

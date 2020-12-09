@@ -1,0 +1,33 @@
+<launch>
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find wpb_mani_simulator)/worlds/simple.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="recording" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!-- Spawn a robot  -->
+  <param name="robot_description" command="$(find xacro)/xacro.py --inorder $(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro" />
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -x 0 -y 0 -model wpb_mani" />
+
+  <!-- load the controllers of wpb_mani-->
+  <include file="$(find wpb_mani_simulator)/launch/wpb_mani_controllers.launch"/>
+
+  <!-- Spawn the balls into Gazebo -->
+  <node name="orange_ball" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpb_mani_simulator)/models/balls/orange_ball.model -x 1.0 -y -0 -z 0  -urdf -model orange_ball" />
+  <node name="red_ball" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpb_mani_simulator)/models/balls/red_ball.model -x 1.0 -y 0.5 -z 0  -urdf -model red_ball" />
+  <node name="green_ball" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpb_mani_simulator)/models/balls/green_ball.model -x 1.0 -y -0.5 -z 0 -urdf -model green_ball" />
+  <node name="blue_ball" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpb_mani_simulator)/models/balls/blue_ball.model -x 2.0 -y -0 -z 0  -urdf -model blue_ball" />
+
+  <!-- RViz and TF tree -->
+  <arg name="rvizconfig" default="$(find wpb_mani_simulator)/rviz/boxes.rviz" />
+   <arg name="model" default="$(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro"/>
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+</launch>
