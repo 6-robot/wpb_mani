@@ -274,6 +274,14 @@ target_link_libraries(wpb_mani_joint_control
   ${catkin_LIBRARIES}
 )
 
+add_executable(wpb_mani_pointcloud_node
+  src/wpb_mani_pointcloud_node.cpp
+)
+add_dependencies(wpb_mani_pointcloud_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(wpb_mani_pointcloud_node
+  ${catkin_LIBRARIES}
+)
+
 add_executable(wpb_mani_plane_detect
   src/wpb_mani_plane_detect.cpp
 )
