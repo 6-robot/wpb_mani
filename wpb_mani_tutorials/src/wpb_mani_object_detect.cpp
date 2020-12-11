@@ -123,11 +123,8 @@ int main(int argc, char **argv)
     ros::NodeHandle nh;
     ros::Subscriber pc_sub = nh.subscribe("/points2", 10 , PointcloudCB);
 
-ROS_INFO("object");
     ros::spin();
 
     delete tf_listener; 
-
     return 0;
-
 }
