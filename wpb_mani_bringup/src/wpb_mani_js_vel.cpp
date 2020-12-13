@@ -45,6 +45,7 @@ class TeleopJoy
 {
 public:
   TeleopJoy();
+  bool bStart;
   float lx;
   float ly;
   float ry;
@@ -64,6 +65,7 @@ TeleopJoy::TeleopJoy()
   lx = 0;
   ly = 0;
   ry = 0;
+  bStart = false;
   velcmd_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel",10);
   sub = n.subscribe<sensor_msgs::Joy>("joy",10,&TeleopJoy::JSCallBack,this);
   current_time = ros::Time::now();
@@ -78,12 +80,15 @@ void TeleopJoy::JSCallBack(const sensor_msgs::Joy::ConstPtr& joy)
   ly = joy->axes[0];  //左右移动
   ry = joy->axes[3];  //旋转
   ROS_INFO("Joy: linear [%.2f , %.2f]   angular %.2f", lx , ry ,ry);
+  bStart = true;
 }
 
 static float kl = 0.2;
 static float kt = 0.5;
 void TeleopJoy::SendVelcmd()
 {
+  if(bStart == false)
+    return;
   geometry_msgs::Twist vel_cmd;
   vel_cmd.linear.x = (float)lx*kl;
   vel_cmd.linear.y = (float)ly*kl;

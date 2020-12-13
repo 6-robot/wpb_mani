@@ -87,7 +87,7 @@ void NaviResultCB(const std_msgs::String::ConstPtr &msg)
         if(msg->data == "done")
         {
             ROS_INFO("[NaviResultCB] Waypoint 1!");
-            plane_height_msg.data = 0.21;      //载物台高度(单位:米)
+            plane_height_msg.data = 0.22;      //载物台高度(单位:米)
             plane_height_pub.publish(plane_height_msg);
             step = STEP_BOX_DETECT;
         }
