@@ -159,9 +159,9 @@
     <child link="link1"/>
   </joint>
 
-  <!-- Gazebo plugin for WPR -->
+  <!-- Gazebo plugin for WPB_MANI -->
   <gazebo>
-    <plugin name="base_controller" filename="libwpr_plugin.so">
+    <plugin name="base_controller" filename="libwpb_mani_plugin.so">
       <publishOdometryTf>true</publishOdometryTf>
       <commandTopic>cmd_vel</commandTopic>
       <odometryTopic>/odom</odometryTopic>

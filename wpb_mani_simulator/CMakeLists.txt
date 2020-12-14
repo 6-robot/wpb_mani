@@ -215,6 +215,9 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
+add_library(wpb_mani_plugin SHARED src/wpb_mani_plugin.cpp)
+target_link_libraries(wpb_mani_plugin ${GAZEBO_LIBRARIES})
+
 add_executable(wpb_mani_sim
   src/wpb_mani_sim.cpp
   src/wpb_mani_gripper.cpp
