@@ -6,8 +6,14 @@
     <arg name="cam_info_topic" default="/rgb/camera_info" /> <!--修改为自己发布的标定参数话题-->
     <arg name="output_frame" default="/rgb_camera_link" /> <!--修改为图片所在的坐标系，关系到后续的坐标系自动转换-->
 
-    <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen"
-     args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame)" />
+   <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen"> 
+        <param name="marker_size"   type="double" value="$(arg marker_size)"/>
+        <param name="max_new_marker_error"  type="double" value="$(arg max_new_marker_error)"/>
+        <param name="max_track_error"   type="double" value="$(arg max_track_error)"/>
+        <param name="output_frame"  type="string" value="$(arg output_frame)"/>
+        <remap from="camera_image" to="$(arg cam_image_topic)"/>
+        <remap from="camera_info" to="$(arg cam_info_topic)"/>
+  </node>
 
     <arg name="model" default="$(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro"/>
     <arg name="gui" default="true" />
