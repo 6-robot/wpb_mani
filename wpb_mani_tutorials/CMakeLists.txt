@@ -362,6 +362,14 @@ target_link_libraries(wpb_mani_grab_height
   ${catkin_LIBRARIES}
 )
 
+add_executable(wpb_mani_grab_again
+  src/wpb_mani_grab_again.cpp
+)
+add_dependencies(wpb_mani_grab_again ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(wpb_mani_grab_again
+  ${catkin_LIBRARIES}
+)
+
 add_executable(wpb_mani_waypoint_navigation
   src/wpb_mani_waypoint_navigation.cpp
 )
