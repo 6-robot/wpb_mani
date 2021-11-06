@@ -338,6 +338,14 @@ target_link_libraries(wpb_mani_ar_track
   ${catkin_LIBRARIES}
 )
 
+add_executable(wpb_mani_qr_demo
+  src/wpb_mani_qr_demo.cpp
+)
+add_dependencies(wpb_mani_qr_demo ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(wpb_mani_qr_demo
+  ${catkin_LIBRARIES}
+)
+
 add_executable(wpb_mani_pass_through
   src/wpb_mani_pass_through.cpp
 )
