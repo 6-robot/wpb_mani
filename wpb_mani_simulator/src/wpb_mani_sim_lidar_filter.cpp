@@ -74,7 +74,7 @@ CWPHLidarFilter::CWPHLidarFilter()
 
 void CWPHLidarFilter::lidarCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
-    //ROS_INFO("[wpb_home_lidar_filter]");
+    //ROS_INFO("[wpb_mani_lidar_filter]");
     int nRanges = scan->ranges.size();
     sensor_msgs::LaserScan new_scan;
     new_scan.header.stamp = scan->header.stamp;

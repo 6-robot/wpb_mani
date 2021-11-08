@@ -327,7 +327,7 @@ void CWPB_Mani_driver::m_ParseFrame()
 			fQuatZ = (float)m_Piece2int(&m_ParseBuf[11]);
 			// yaw: (about Z axis)
     		//fCurYaw = atan2(2*fQuatX*fQuatY - 2*fQuatW*fQuatZ, 2*fQuatW*fQuatW + 2*fQuatX*fQuatX - 1);
-			//printf("[CWPB_Home_driver] fYaw = %.2f\n",fCurYaw);
+			//printf("[CWPB_Mani_driver] fYaw = %.2f\n",fCurYaw);
 			if(bFirstQuart == true)
 			{
 				//fFirstYaw = fCurYaw;

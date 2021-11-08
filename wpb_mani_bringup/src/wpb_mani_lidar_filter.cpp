@@ -83,7 +83,7 @@ void CWPHLidarFilter::Resize(int inNum)
 
 void CWPHLidarFilter::LidarCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
-    //ROS_INFO("[wpb_home_lidar_filter]");
+    //ROS_INFO("[wpb_mani_lidar_filter]");
     int nRanges = scan->ranges.size();
     if(nRanges != nLidarPointNum)
     {
