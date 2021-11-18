@@ -285,3 +285,12 @@ add_dependencies(wpb_mani_calibrate_kinect ${${PROJECT_NAME}_EXPORTED_TARGETS} $
 target_link_libraries(wpb_mani_calibrate_kinect
   ${catkin_LIBRARIES}
 )
+
+## Declare a C++ executable
+add_executable(wpb_mani_dummy
+  src/wpb_mani_dummy.cpp
+)
+add_dependencies(wpb_mani_dummy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(wpb_mani_dummy
+  ${catkin_LIBRARIES}
+)
