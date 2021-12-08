@@ -204,8 +204,8 @@ int main(int argc, char** argv)
     n_param.param<std::string>("serial_port", strSerialPort, "/dev/ttyUSB0");
     m_wpb_mani.Open(strSerialPort.c_str(),115200);
 
-    bool bImuOdom;
-    n_param.param<bool>("imu_odom", bImuOdom, false);
+    bool bImu;
+    n_param.param<bool>("imu", bImu, false);
     
     ros::Time current_time, last_time;
     current_time = ros::Time::now();
@@ -300,109 +300,107 @@ int main(int argc, char** argv)
         last_time = current_time;
         current_time = ros::Time::now();
 
-        if(bImuOdom == false)
+        double fVx,fVy,fVz;
+        double fPosDiff[4];
+        if(nLastMotorPos[0] != m_wpb_mani.arMotorPos[0] || nLastMotorPos[1] != m_wpb_mani.arMotorPos[1] || nLastMotorPos[2] != m_wpb_mani.arMotorPos[2] || nLastMotorPos[3] != m_wpb_mani.arMotorPos[3])
+        //if(true)
         {
-            double fVx,fVy,fVz;
-            double fPosDiff[4];
-            if(nLastMotorPos[0] != m_wpb_mani.arMotorPos[0] || nLastMotorPos[1] != m_wpb_mani.arMotorPos[1] || nLastMotorPos[2] != m_wpb_mani.arMotorPos[2] || nLastMotorPos[3] != m_wpb_mani.arMotorPos[3])
-            //if(true)
+            //ROS_WARN("[M0] %d    [M1] %d    [M2] %d    [M3] %d",m_wpb_mani.arMotorPos[0],m_wpb_mani.arMotorPos[1],m_wpb_mani.arMotorPos[2],m_wpb_mani.arMotorPos[3]);
+            fPosDiff[0] = (double)(m_wpb_mani.arMotorPos[0] - nLastMotorPos[0]); 
+            fPosDiff[1] = (double)(m_wpb_mani.arMotorPos[1] - nLastMotorPos[1]);
+            fPosDiff[2] = (double)(m_wpb_mani.arMotorPos[2] - nLastMotorPos[2]);
+            fPosDiff[3] = (double)(m_wpb_mani.arMotorPos[3] - nLastMotorPos[3]);
+            //ROS_INFO("[D0] %.2f    [D1] %.2f   [D2] %.2f    [D3] %.2f",fPosDiff[0],fPosDiff[1],fPosDiff[2],fPosDiff[3]);
+            int nMaxDiff = 1000;
+            if(
+                fabs( fPosDiff[0] ) > nMaxDiff || fabs( fPosDiff[1] ) > nMaxDiff || fabs( fPosDiff[2] ) > nMaxDiff || fabs( fPosDiff[3] ) > nMaxDiff 
+            )
             {
-                //ROS_WARN("[M0] %d    [M1] %d    [M2] %d    [M3] %d",m_wpb_mani.arMotorPos[0],m_wpb_mani.arMotorPos[1],m_wpb_mani.arMotorPos[2],m_wpb_mani.arMotorPos[3]);
-                fPosDiff[0] = (double)(m_wpb_mani.arMotorPos[0] - nLastMotorPos[0]); 
-                fPosDiff[1] = (double)(m_wpb_mani.arMotorPos[1] - nLastMotorPos[1]);
-                fPosDiff[2] = (double)(m_wpb_mani.arMotorPos[2] - nLastMotorPos[2]);
-                fPosDiff[3] = (double)(m_wpb_mani.arMotorPos[3] - nLastMotorPos[3]);
-                //ROS_INFO("[D0] %.2f    [D1] %.2f   [D2] %.2f    [D3] %.2f",fPosDiff[0],fPosDiff[1],fPosDiff[2],fPosDiff[3]);
-                int nMaxDiff = 1000;
-                if(
-                    fabs( fPosDiff[0] ) > nMaxDiff || fabs( fPosDiff[1] ) > nMaxDiff || fabs( fPosDiff[2] ) > nMaxDiff || fabs( fPosDiff[3] ) > nMaxDiff 
-                )
-                {
-                    ROS_WARN("[M0]= %d    last =  %d",m_wpb_mani.arMotorPos[0],nLastMotorPos[0]); 
-                    ROS_WARN("[M1]= %d    last =  %d",m_wpb_mani.arMotorPos[1],nLastMotorPos[1]); 
-                    ROS_WARN("[M2]= %d    last =  %d",m_wpb_mani.arMotorPos[2],nLastMotorPos[2]); 
-                    ROS_WARN("[M3]= %d    last =  %d",m_wpb_mani.arMotorPos[3],nLastMotorPos[3]);  
-                    ROS_WARN("-----------------------------------"); 
-                }
-
-                
-                fVx = (fPosDiff[1] - fPosDiff[0]) * fKVx;
-                fVy = (fPosDiff[1] - fPosDiff[2]) *fKVy;
-                fVz = (fPosDiff[0] + fPosDiff[1] + fPosDiff[2] + fPosDiff[3])*fKVz;
-                double fTimeDur = current_time.toSec() - last_time.toSec();
-                //方案一 通过电机码盘解算里程计数据（位移/时间=速度）
-                fVx = fVx/(fTimeDur);
-                fVy = fVy/(fTimeDur);
-                fVz = fVz/(fTimeDur);
-                //ROS_WARN("[Velocity]    fVx=%.2f   fVy=%.2f    fVz=%.2f",fVx,fVy,fVz);
-                // 方案二 直接把下发速度当作里程计积分依据
-                // fVx = lastVel.linear.x;
-                // fVy = lastVel.linear.y;
-                // fVz = lastVel.angular.z;
-                
-                double dx = (lastVel.linear.x*cos(lastPose.theta) - lastVel.linear.y*sin(lastPose.theta))*fTimeDur;
-                double dy = (lastVel.linear.x*sin(lastPose.theta) + lastVel.linear.y*cos(lastPose.theta))*fTimeDur;
-
-                lastPose.x += dx;
-                lastPose.y += dy;
-                lastPose.theta += (fVz*fTimeDur);
-
-                double pd_dx = (lastVel.linear.x*cos(pose_diff_msg.theta) - lastVel.linear.y*sin(pose_diff_msg.theta))*fTimeDur;
-                double pd_dy = (lastVel.linear.x*sin(pose_diff_msg.theta) + lastVel.linear.y*cos(pose_diff_msg.theta))*fTimeDur;
-                pose_diff_msg.x += pd_dx;
-                pose_diff_msg.y += pd_dy;
-                pose_diff_msg.theta += (fVz*fTimeDur);
-
-                odom_quat = tf::createQuaternionMsgFromRollPitchYaw(0,0,lastPose.theta);
-                //updata transform
-                odom_trans.header.stamp = current_time;
-                odom_trans.transform.translation.x = lastPose.x;
-                odom_trans.transform.translation.y = lastPose.y;
-                odom_trans.transform.translation.z = 0;
-                odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(lastPose.theta);
-
-                //filling the odometry
-                odom.header.stamp = current_time;
-                //position
-                odom.pose.pose.position.x = lastPose.x;
-                odom.pose.pose.position.y = lastPose.y;
-                odom.pose.pose.position.z = 0.0;
-                odom.pose.pose.orientation = odom_quat;
-                //velocity
-                odom.twist.twist.linear.x = fVx;
-                odom.twist.twist.linear.y = fVy;
-                odom.twist.twist.linear.z = 0;
-                odom.twist.twist.angular.x = 0;
-                odom.twist.twist.angular.y = 0;
-                odom.twist.twist.angular.z = fVz;
-
-                //plublishing the odometry and new tf
-                broadcaster.sendTransform(odom_trans);
-                odom_pub.publish(odom);
-
-                lastVel.linear.x = fVx;
-                lastVel.linear.y = fVy;
-                lastVel.angular.z = fVz;
-
-                nLastMotorPos[0] = m_wpb_mani.arMotorPos[0];
-                nLastMotorPos[1] = m_wpb_mani.arMotorPos[1];
-                nLastMotorPos[2] = m_wpb_mani.arMotorPos[2];
-                nLastMotorPos[3] = m_wpb_mani.arMotorPos[3];
-            }
-            else
-            {
-                odom_trans.header.stamp = ros::Time::now();
-                //plublishing the odometry and new tf
-                broadcaster.sendTransform(odom_trans);
-                odom.header.stamp = ros::Time::now();
-                odom_pub.publish(odom);
-                //ROS_INFO("[odom] zero");
+                ROS_WARN("[M0]= %d    last =  %d",m_wpb_mani.arMotorPos[0],nLastMotorPos[0]); 
+                ROS_WARN("[M1]= %d    last =  %d",m_wpb_mani.arMotorPos[1],nLastMotorPos[1]); 
+                ROS_WARN("[M2]= %d    last =  %d",m_wpb_mani.arMotorPos[2],nLastMotorPos[2]); 
+                ROS_WARN("[M3]= %d    last =  %d",m_wpb_mani.arMotorPos[3],nLastMotorPos[3]);  
+                ROS_WARN("-----------------------------------"); 
             }
 
-            pose_diff_pub.publish(pose_diff_msg);
-            //ROS_INFO("[pose_diff_msg] x= %.2f  y=%.2f  th= %.2f", pose_diff_msg.x,pose_diff_msg.y,pose_diff_msg.theta);
+            
+            fVx = (fPosDiff[1] - fPosDiff[0]) * fKVx;
+            fVy = (fPosDiff[1] - fPosDiff[2]) *fKVy;
+            fVz = (fPosDiff[0] + fPosDiff[1] + fPosDiff[2] + fPosDiff[3])*fKVz;
+            double fTimeDur = current_time.toSec() - last_time.toSec();
+            //方案一 通过电机码盘解算里程计数据（位移/时间=速度）
+            fVx = fVx/(fTimeDur);
+            fVy = fVy/(fTimeDur);
+            fVz = fVz/(fTimeDur);
+            //ROS_WARN("[Velocity]    fVx=%.2f   fVy=%.2f    fVz=%.2f",fVx,fVy,fVz);
+            // 方案二 直接把下发速度当作里程计积分依据
+            // fVx = lastVel.linear.x;
+            // fVy = lastVel.linear.y;
+            // fVz = lastVel.angular.z;
+            
+            double dx = (lastVel.linear.x*cos(lastPose.theta) - lastVel.linear.y*sin(lastPose.theta))*fTimeDur;
+            double dy = (lastVel.linear.x*sin(lastPose.theta) + lastVel.linear.y*cos(lastPose.theta))*fTimeDur;
+
+            lastPose.x += dx;
+            lastPose.y += dy;
+            lastPose.theta += (fVz*fTimeDur);
+
+            double pd_dx = (lastVel.linear.x*cos(pose_diff_msg.theta) - lastVel.linear.y*sin(pose_diff_msg.theta))*fTimeDur;
+            double pd_dy = (lastVel.linear.x*sin(pose_diff_msg.theta) + lastVel.linear.y*cos(pose_diff_msg.theta))*fTimeDur;
+            pose_diff_msg.x += pd_dx;
+            pose_diff_msg.y += pd_dy;
+            pose_diff_msg.theta += (fVz*fTimeDur);
+
+            odom_quat = tf::createQuaternionMsgFromRollPitchYaw(0,0,lastPose.theta);
+            //updata transform
+            odom_trans.header.stamp = current_time;
+            odom_trans.transform.translation.x = lastPose.x;
+            odom_trans.transform.translation.y = lastPose.y;
+            odom_trans.transform.translation.z = 0;
+            odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(lastPose.theta);
+
+            //filling the odometry
+            odom.header.stamp = current_time;
+            //position
+            odom.pose.pose.position.x = lastPose.x;
+            odom.pose.pose.position.y = lastPose.y;
+            odom.pose.pose.position.z = 0.0;
+            odom.pose.pose.orientation = odom_quat;
+            //velocity
+            odom.twist.twist.linear.x = fVx;
+            odom.twist.twist.linear.y = fVy;
+            odom.twist.twist.linear.z = 0;
+            odom.twist.twist.angular.x = 0;
+            odom.twist.twist.angular.y = 0;
+            odom.twist.twist.angular.z = fVz;
+
+            //plublishing the odometry and new tf
+            broadcaster.sendTransform(odom_trans);
+            odom_pub.publish(odom);
+
+            lastVel.linear.x = fVx;
+            lastVel.linear.y = fVy;
+            lastVel.angular.z = fVz;
+
+            nLastMotorPos[0] = m_wpb_mani.arMotorPos[0];
+            nLastMotorPos[1] = m_wpb_mani.arMotorPos[1];
+            nLastMotorPos[2] = m_wpb_mani.arMotorPos[2];
+            nLastMotorPos[3] = m_wpb_mani.arMotorPos[3];
         }
         else
+        {
+            odom_trans.header.stamp = ros::Time::now();
+            //plublishing the odometry and new tf
+            broadcaster.sendTransform(odom_trans);
+            odom.header.stamp = ros::Time::now();
+            odom_pub.publish(odom);
+            //ROS_INFO("[odom] zero");
+        }
+
+        pose_diff_pub.publish(pose_diff_msg);
+        //ROS_INFO("[pose_diff_msg] x= %.2f  y=%.2f  th= %.2f", pose_diff_msg.x,pose_diff_msg.y,pose_diff_msg.theta);
+    
+        if(bImu == true)
         {
             //imu
             sensor_msgs::Imu imu_msg = sensor_msgs::Imu();	
