@@ -186,6 +186,7 @@ static double fWheelPosK = -0.1*M_PI/180;
 static geometry_msgs::Pose2D lastPose;
 int main(int argc, char** argv)
 {
+    setlocale(LC_ALL,"");
     ros::init(argc,argv,"wpb_mani_core");
     ros::NodeHandle n;
     ros::Subscriber cmd_vel_sub = n.subscribe("cmd_vel",10,&CmdVelCallback);
@@ -206,6 +207,8 @@ int main(int argc, char** argv)
 
     bool bImu;
     n_param.param<bool>("imu", bImu, false);
+    if(bImu == true)
+        ROS_WARN("[wpb_mani_core] 开启姿态IMU信息发布！");
     
     ros::Time current_time, last_time;
     current_time = ros::Time::now();
