@@ -154,7 +154,7 @@ int main(int argc, char** argv)
     gripper_ctrl_msg.position.resize(1);
     gripper_ctrl_msg.velocity.resize(1);
     gripper_ctrl_msg.name[0] = "gripper";
-    gripper_ctrl_msg.position[0] = 0.7;
+    gripper_ctrl_msg.position[0] = 0.07;
     gripper_ctrl_msg.velocity[0] = 10;
 
     sleep(1);
@@ -175,7 +175,7 @@ int main(int argc, char** argv)
             deley_count ++;
             if(deley_count > 10*5)
             {
-                gripper_ctrl_msg.position[0] = 0.7;     //手爪指间距(单位:米)
+                gripper_ctrl_msg.position[0] = 0.07;     //手爪指间距(单位:米)
                 mani_ctrl_pub.publish(gripper_ctrl_msg);
                 deley_count = 0;
                 step = STEP_DROP_BOX;
