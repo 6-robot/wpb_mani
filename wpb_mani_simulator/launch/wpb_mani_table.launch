@@ -10,7 +10,7 @@
   </include>
 
   <!-- Spawn a robot  -->
-  <param name="robot_description" command="$(find xacro)/xacro.py --inorder $(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro" />
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro" />
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -x 0 -y 0 -model wpb_mani" />
 
   <!-- load the controllers of wpb_mani-->
@@ -25,7 +25,7 @@
   <!-- RViz and TF tree -->
   <arg name="rvizconfig" default="$(find wpb_mani_simulator)/rviz/table.rviz" />
    <arg name="model" default="$(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro"/>
-  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />

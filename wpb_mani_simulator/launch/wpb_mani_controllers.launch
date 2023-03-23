@@ -20,7 +20,7 @@
     kinect_pitch_position_controller"/>
     
   <!-- convert joint states to TF transforms for rviz, etc -->
-  <param name="wpb_mani_description" command="$(find xacro)/xacro.py --inorder $(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro" />
+  <param name="wpb_mani_description" command="$(find xacro)/xacro --inorder $(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro" />
   <node name="gazebo_wpb_mani_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
     <remap from="robot_description" to="wpb_mani_description" />
     <remap from="/joint_states" to="/wpb_mani/joint_states" />

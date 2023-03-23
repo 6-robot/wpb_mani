@@ -22,7 +22,7 @@
   <node name="blue_bin" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpb_mani_simulator)/models/bins/blue_bin.model -x -2.2 -y -0.18 -z 0.0 -Y 3.14159 -urdf -model blue_bin" />
 
   <!-- Spawn a robot into Gazebo -->
-  <param name="robot_description" command="$(find xacro)/xacro.py --inorder $(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro" />
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find wpb_mani_description)/urdf/wpb_mani.urdf.xacro" />
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -x 1.5 -y -2 -Y 1.5707 -model wpb_mani" />
 
   <!-- load the controllers of wpb_mani-->
@@ -72,7 +72,7 @@
   <arg name="gui" default="true" />
   <arg name="rvizconfig" default="$(find waterplus_map_tools)/rviz/nav.rviz" />
 
-  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
   <param name="use_gui" value="$(arg gui)"/>
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>

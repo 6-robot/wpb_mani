@@ -19,7 +19,7 @@
     <arg name="gui" default="true" />
     <arg name="rvizconfig" default="$(find wpb_mani_tutorials)/rviz/qr_code.rviz" />
 
-    <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+    <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
     <param name="use_gui" value="$(arg gui)"/>
     
     <!-- wpb_mani core-->
