@@ -7,4 +7,5 @@ sudo apt-get install -y ros-noetic-navigation
 sudo apt-get install -y ros-noetic-cv-bridge
 sudo apt-get install -y ros-noetic-controller-manager
 sudo apt-get install -y ros-noetic-moveit
-sudo apt-get install -y ros-noetic-ar-track-alvar
+cd ~/catkin_ws/src
+git clone https://gitee.com/s-robot/ar_track_alvar.git
