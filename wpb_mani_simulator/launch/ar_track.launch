@@ -13,7 +13,7 @@
         <param name="output_frame"  type="string" value="$(arg output_frame)"/>
         <remap from="camera_image" to="$(arg cam_image_topic)"/>
         <remap from="camera_info" to="$(arg cam_info_topic)"/>
-  </node>
+    </node>
 
     <include file="$(find wpb_mani_simulator)/launch/wpb_mani_qr_cube.launch"/>
 

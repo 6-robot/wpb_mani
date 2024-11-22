@@ -24,6 +24,7 @@
   <node name="gazebo_wpb_mani_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
     <remap from="robot_description" to="wpb_mani_description" />
     <remap from="/joint_states" to="/wpb_mani/joint_states" />
+    <param name="publish_frequency" value="20"/>
   </node>
 
   <node name="wpb_mani_sim" pkg="wpb_mani_simulator" type="wpb_mani_sim" output="screen">

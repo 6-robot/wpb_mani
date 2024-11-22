@@ -38,8 +38,6 @@
     <param name="use_dijkstra" value="true"/>
     <param name="base_local_planner" value="wpb_local_planner/WpbLocalPlanner" />
     <param name= "controller_frequency" value="10" type="double"/>
-    <param name= "oscillation_timeout" value="8" type="double"/>
-    <param name= "oscillation_distance" value="0.2" type="double"/>
   </node>
 
   <!-- RViz and TF tree -->
@@ -50,7 +48,6 @@
 
   <param name="use_gui" value="$(arg gui)"/>
 
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
 
 </launch>
